@@ -1,1 +1,2 @@
-# cash-for-crypto-api
+# Cash For Crypto API
+To run: `npm start`

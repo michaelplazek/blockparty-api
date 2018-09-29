@@ -32,7 +32,8 @@ module.exports = function(app, db) {
             location: req.body.location,
             timestamp: new Date(),
             message: req.body.message,
-            price: req.body.price
+            price: req.body.price,
+            amount: req.body.amount
         };
         db.collection('posts').insert(post, (err, result) => {
             if (err) {
@@ -64,7 +65,8 @@ module.exports = function(app, db) {
             location: req.body.location,
             timestamp: new Date(),
             message: req.body.message,
-            price: req.body.price
+            price: req.body.price,
+            amount: req.body.amount
         };
         db.collection('posts').update(details, post, (err, result) => {
             if (err) {

@@ -2,6 +2,18 @@ const ObjectID = require('mongodb').ObjectID;
 
 module.exports = function(app, db) {
 
+    app.get('/posts', (req, res) => {
+        db.collection('posts').find({}, (err, data) => {
+            if (err) {
+                res.send({'error':'An error has occurred'});
+            } else {
+                data.toArray((err, datum) => {
+                    res.send(datum);
+                })
+            }
+        });
+    });
+
     app.get('/posts/:id', (req, res) => {
         const details = { '_id':  new ObjectID(req.params.id) };
             db.collection('posts').findOne(details, (err, item) => {

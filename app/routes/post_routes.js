@@ -33,7 +33,8 @@ module.exports = function(app, db) {
             timestamp: new Date(),
             message: req.body.message,
             price: req.body.price,
-            amount: req.body.amount
+            amount: req.body.amount,
+            contact: req.body.contact
         };
         db.collection('posts').insert(post, (err, result) => {
             if (err) {
@@ -66,7 +67,8 @@ module.exports = function(app, db) {
             timestamp: new Date(),
             message: req.body.message,
             price: req.body.price,
-            amount: req.body.amount
+            amount: req.body.amount,
+            contact: req.body.contact
         };
         db.collection('posts').update(details, post, (err, result) => {
             if (err) {

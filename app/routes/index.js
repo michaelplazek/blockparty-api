@@ -1,6 +1,9 @@
 const postRoutes = require('./post_routes');
+const userRoutes = require('./user_routes');
+const sessionRoutes = require('./session_routes');
 
 module.exports = function(app, db) {
     postRoutes(app, db);
-    // Other route groups could go here, in the future
+    userRoutes(app, db);
+    sessionRoutes(app, db);
 };

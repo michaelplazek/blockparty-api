@@ -1,5 +1,3 @@
-const ObjectID = require('mongodb').ObjectID;
-
 module.exports = function(app, db) {
 
     app.post('/users', (req, res) => {

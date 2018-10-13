@@ -1,3 +1,5 @@
+const md5 = require('md5');
+
 module.exports = function(app, db) {
 
     app.post('/login', (req, res) => {
@@ -5,22 +7,23 @@ module.exports = function(app, db) {
             email: req.body.email,
             password: req.body.password,
         };
-        db.collection('users').findOne(user, (err, item) => {
-            if (!item) {
-                res.send({'error':'An error has occurred'});
-            } else {
-                if (user.password === item.password) { // user is valid
 
-                    // set the session to be valid
-                    req.session.user = item;
-
-                    // return the user info
-                    res.send(item);
-                } else {
-                    res.send({'error':'An error has occurred'});
-                }
-            }
-        });
+    //     db.collection('users').findOne({}, user, (err, item) => {
+    //         if (!item) {
+    //             res.status(404).send('User not found.');
+    //         } else {
+    //             if (user.password === item.password) { // user is valid
+    //
+    //                 // set the session to be valid
+    //                 req.session.user = item;
+    //
+    //                 // return the user info
+    //                 res.status(200).send(item);
+    //             } else {
+    //                 res.status(404).send('User not found.');
+    //             }
+    //         }
+    //     });
     });
 
     app.get('/logout', function(req, res) {

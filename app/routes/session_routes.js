@@ -22,9 +22,9 @@ module.exports = function(app, db) {
             }
         });
     });
-};
 
-app.get('/logout', function(req, res) {
-    req.session.reset();
-    res.redirect('/');
-});
+    app.get('/logout', function(req, res) {
+        req.session.reset();
+        res.redirect('/');
+    });
+};

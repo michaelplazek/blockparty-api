@@ -2,7 +2,7 @@ module.exports = function(app, db) {
 
     app.post('/users', (req, res) => {
         const user = {
-            username: req.body.username,
+            email: req.body.email,
             password: req.body.password,
         };
         db.collection('users').insert(user, (err, result) => {

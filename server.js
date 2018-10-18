@@ -10,10 +10,8 @@ const port = 8000;
 
 app.use(bodyParser.json({ extended: true }));
 
-// middleware that checks if JWT token exists and verifies it if it does exist.
-// In all the future routes, this helps to know if the request is authenticated or not.
+// authentication middleware to check JWT token
 app.use(function(req, res, next) {
-    // check header or url parameters or post parameters for token
     let token = req.headers['authorization'];
     if (!token) return next(); //if no token, continue
 
@@ -32,6 +30,7 @@ app.use(function(req, res, next) {
     });
 });
 
+// set headers for responses
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -40,6 +39,7 @@ app.use(function (req, res, next) {
     next();
 });
 
+// connect database
 MongoClient.connect(db.url, (err, database) => {
     if (err) return console.log(err);
 

@@ -27,14 +27,16 @@ module.exports = function(app, db) {
 
     app.post('/posts', (req, res) => {
         const post = {
-            coin: req.body.coin,
-            owner: req.body.owner,
-            location: req.body.location,
-            timestamp: new Date(),
-            message: req.body.message,
-            price: req.body.price,
-            amount: req.body.amount,
-            contact: req.body.contact
+					coin: req.body.coin,
+					owner: req.body.owner,
+					// location: req.body.location,
+					timestamp: new Date(),
+					// message: req.body.message,
+					price: req.body.price,
+					volume: req.body.volume,
+					// contact: req.body.contact,
+					lat: req.body.lat,
+					lng: req.body.lng,
         };
         db.collection('posts').insert(post, (err, result) => {
             if (err) {
@@ -61,14 +63,16 @@ module.exports = function(app, db) {
         const id = req.params.id;
         const details = { '_id': new ObjectID(id) };
         const post = {
-            coin: req.body.coin,
-            owner: req.body.owner,
-            location: req.body.location,
-            timestamp: new Date(),
-            message: req.body.message,
-            price: req.body.price,
-            amount: req.body.amount,
-            contact: req.body.contact
+					coin: req.body.coin,
+					owner: req.body.owner,
+					// location: req.body.location,
+					timestamp: new Date(),
+					// message: req.body.message,
+					price: req.body.price,
+					volume: req.body.volume,
+					// contact: req.body.contact,
+					lat: req.body.lat,
+					lng: req.body.lng,
         };
         db.collection('posts').update(details, post, (err, result) => {
             if (err) {

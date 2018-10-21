@@ -4,7 +4,7 @@ const ObjectID = require('mongodb').ObjectID;
 function generateToken(user) {
 
     const u = {
-        email: user.email,
+        username: user.username,
         _id: user._id.toString(),
     };
     return jwt.sign(u, process.env.SESSION_SECRET, {
@@ -16,7 +16,7 @@ module.exports = function(app, db) {
 
     app.post('/users/signup', (req, res, next) => {
         const user = {
-            email: req.body.email,
+            username: req.body.username,
             password: req.body.password,
         };
         db.collection('users').insert(user, err => {
@@ -33,7 +33,7 @@ module.exports = function(app, db) {
 
     app.post('/users/login', (req, res) => {
 
-        db.collection('users').findOne({ email: req.body.email }, (err, user) => {
+        db.collection('users').findOne({ username: req.body.username }, (err, user) => {
             if (err) throw err;
             if (!user) {
                 return res.status(404).json({

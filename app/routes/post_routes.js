@@ -29,12 +29,12 @@ module.exports = function(app, db) {
         const post = {
 					coin: req.body.coin,
 					owner: req.body.owner,
-					location: req.body.location,
+					// location: req.body.location,
 					timestamp: new Date(),
-					message: req.body.message,
+					// message: req.body.message,
 					price: req.body.price,
-					amount: req.body.amount,
-					contact: req.body.contact,
+					volume: req.body.volume,
+					// contact: req.body.contact,
 					lat: req.body.lat,
 					lng: req.body.lng,
         };
@@ -65,14 +65,14 @@ module.exports = function(app, db) {
         const post = {
 					coin: req.body.coin,
 					owner: req.body.owner,
-					location: req.body.location,
+					// location: req.body.location,
 					timestamp: new Date(),
-					message: req.body.message,
+					// message: req.body.message,
 					price: req.body.price,
-					amount: req.body.amount,
-					contact: req.body.contact,
-					lat: req.body.position.lat,
-					lng: req.body.position.lng,
+					volume: req.body.volume,
+					// contact: req.body.contact,
+					lat: req.body.lat,
+					lng: req.body.lng,
         };
         db.collection('posts').update(details, post, (err, result) => {
             if (err) {

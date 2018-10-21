@@ -72,9 +72,7 @@ module.exports = function(app, db) {
 
         jwt.verify(token, process.env.SESSION_SECRET, function(err, user) {
             if (err) throw err;
-            console.log(user);
             db.collection('users').findOne({ _id: new ObjectID(user._id) }, (err, item) => {
-                console.log(item);
                 if (err) throw err;
                 res.json({
                     user: item,

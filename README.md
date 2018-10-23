@@ -1,2 +1,17 @@
 # Cash For Crypto API
-To run: `npm start`
+
+## Setup
+Install dependencies
+```
+yarn
+```
+
+(Optional) Set port
+```
+export PORT=8080
+```
+
+Start API
+```
+npm start
+```

@@ -2,8 +2,8 @@ const ObjectID = require('mongodb').ObjectID;
 
 module.exports = function(app, db) {
 
-    app.get('/posts', (req, res) => {
-        db.collection('posts').find({}, (err, data) => {
+    app.get('/asks', (req, res) => {
+        db.collection('asks').find({}, (err, data) => {
             if (err) {
                 res.send({'error':'An error has occurred'});
             } else {
@@ -14,9 +14,9 @@ module.exports = function(app, db) {
         });
     });
 
-    app.get('/posts/:id', (req, res) => {
+    app.get('/asks/:id', (req, res) => {
         const details = { '_id':  new ObjectID(req.params.id) };
-            db.collection('posts').findOne(details, (err, item) => {
+            db.collection('asks').findOne(details, (err, item) => {
                 if (err) {
                 res.send({'error':'An error has occurred'});
                 } else {
@@ -25,7 +25,7 @@ module.exports = function(app, db) {
             });
         });
 
-    app.post('/posts', (req, res) => {
+    app.post('/asks', (req, res) => {
         const post = {
 					coin: req.body.coin,
 					owner: req.body.owner,
@@ -38,7 +38,7 @@ module.exports = function(app, db) {
 					lat: req.body.lat,
 					lng: req.body.lng,
         };
-        db.collection('posts').insert(post, (err, result) => {
+        db.collection('asks').insert(post, (err, result) => {
             if (err) {
                 res.send({ 'error': 'An error has occurred' });
             } else {
@@ -47,10 +47,10 @@ module.exports = function(app, db) {
         });
     });
 
-    app.delete('/posts/:id', (req, res) => {
+    app.delete('/asks/:id', (req, res) => {
         const id = req.params.id;
         const details = { '_id': new ObjectID(id) };
-        db.collection('posts').remove(details, (err, item) => {
+        db.collection('asks').remove(details, (err, item) => {
             if (err) {
                 res.send({'error':'An error has occurred'});
             } else {
@@ -59,7 +59,7 @@ module.exports = function(app, db) {
         });
     });
 
-    app.put('/posts/:id', (req, res) => {
+    app.put('/asks/:id', (req, res) => {
         const id = req.params.id;
         const details = { '_id': new ObjectID(id) };
         const post = {
@@ -74,7 +74,7 @@ module.exports = function(app, db) {
 					lat: req.body.lat,
 					lng: req.body.lng,
         };
-        db.collection('posts').update(details, post, (err, result) => {
+        db.collection('asks').update(details, post, (err, result) => {
             if (err) {
                 res.send({'error':'An error has occurred'});
             } else {

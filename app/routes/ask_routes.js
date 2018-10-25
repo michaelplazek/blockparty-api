@@ -14,8 +14,8 @@ module.exports = function(app, db) {
         });
     });
 
-    app.get('/asks/:id', (req, res) => {
-        const details = { '_id':  new ObjectID(req.params.id) };
+    app.get('/ask', (req, res) => {
+        const details = { '_id':  new ObjectID(req.query.id) };
             db.collection('asks').findOne(details, (err, item) => {
                 if (err) {
                 res.send({'error':'An error has occurred'});
@@ -47,8 +47,8 @@ module.exports = function(app, db) {
         });
     });
 
-    app.delete('/asks/:id', (req, res) => {
-        const id = req.params.id;
+    app.delete('/ask', (req, res) => {
+        const id = req.query.id;
         const details = { '_id': new ObjectID(id) };
         db.collection('asks').remove(details, (err, item) => {
             if (err) {
@@ -59,8 +59,8 @@ module.exports = function(app, db) {
         });
     });
 
-    app.put('/asks/:id', (req, res) => {
-        const id = req.params.id;
+    app.put('/ask', (req, res) => {
+        const id = req.query.id;
         const details = { '_id': new ObjectID(id) };
         const post = {
 					coin: req.body.coin,

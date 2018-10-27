@@ -33,6 +33,7 @@ module.exports = function(app, db) {
       volume: req.body.volume,
       lat: req.body.lat,
       lng: req.body.lng,
+      isBid: true,
       timestamp: new Date()
     };
     db.collection("bids").insert(post, (err, result) => {
@@ -68,6 +69,7 @@ module.exports = function(app, db) {
       volume: req.body.volume,
       lat: req.body.lat,
       lng: req.body.lng,
+			isBid: true,
       timestamp: new Date()
     };
     db.collection("bids").update(details, post, (err, result) => {

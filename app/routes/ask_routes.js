@@ -47,8 +47,6 @@ module.exports = function(app, db) {
 			if (err) {
 				res.send({ error: "User not found" });
 			} else {
-				console.log("User found");
-				console.log(result);
 				const post = {
 					coin: req.body.coin,
 					userId: result._id,
@@ -90,8 +88,6 @@ module.exports = function(app, db) {
 			if (err) {
 				res.send({ error: "User not found" });
 			} else {
-				console.log("User found");
-				console.log(result);
 				const post = {
 					coin: req.body.coin,
 					userId: result._id,

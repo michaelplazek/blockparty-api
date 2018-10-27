@@ -28,7 +28,6 @@ module.exports = function(app, db) {
 
 	// GET total bids by a user by userId
 	app.get("/bids/:userId", (req, res) => {
-		console.log(req.params);
 		const details = { userId: new ObjectID(req.params.userId) };
 		db.collection("bids").find(details, (err, data) => {
 			if (err) {
@@ -48,8 +47,6 @@ module.exports = function(app, db) {
 			if (err) {
 				res.send({ error: "User not found" });
 			} else {
-				console.log("User found");
-				console.log(result);
 				const post = {
 					coin: req.body.coin,
 					userId: result._id,
@@ -91,8 +88,6 @@ module.exports = function(app, db) {
 			if (err) {
 				res.send({ error: "User not found" });
 			} else {
-				console.log("User found");
-				console.log(result);
 				const post = {
 					coin: req.body.coin,
 					userId: result._id,

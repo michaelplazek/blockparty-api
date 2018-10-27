@@ -26,46 +26,46 @@ module.exports = function(app, db) {
     });
   });
 
-	// GET total bids by a user by userId
-	app.get("/bids/:userId", (req, res) => {
-		const details = { userId: new ObjectID(req.params.userId) };
-		db.collection("bids").find(details, (err, data) => {
-			if (err) {
-				res.send({ error: "An error has occurred" });
-			} else {
-				data.toArray((err, datum) => {
-					res.send(datum);
-				});
-			}
-		});
-	});
+  // GET total bids by a user by userId
+  app.get("/bids/:userId", (req, res) => {
+    const details = { userId: new ObjectID(req.params.userId) };
+    db.collection("bids").find(details, (err, data) => {
+      if (err) {
+        res.send({ error: "An error has occurred" });
+      } else {
+        data.toArray((err, datum) => {
+          res.send(datum);
+        });
+      }
+    });
+  });
 
   // POST a new bid
   app.post("/bids", (req, res) => {
-  	const user = req.body.owner;
-  	db.collection("users").findOne({ username: user }, (err, result) => {
-			if (err) {
-				res.send({ error: "User not found" });
-			} else {
-				const post = {
-					coin: req.body.coin,
-					userId: result._id,
-					price: req.body.price,
-					volume: req.body.volume,
-					lat: req.body.lat,
-					lng: req.body.lng,
-					isBid: true,
-					timestamp: new Date()
-				};
-				db.collection("bids").insert(post, (err, result) => {
-					if (err) {
-						res.send({ error: "An error has occurred" });
-					} else {
-						res.send(result.ops[0]);
-					}
-				});
-			}
-		});
+    const user = req.body.owner;
+    db.collection("users").findOne({ username: user }, (err, result) => {
+      if (err) {
+        res.send({ error: "User not found" });
+      } else {
+        const post = {
+          coin: req.body.coin,
+          userId: result._id,
+          price: req.body.price,
+          volume: req.body.volume,
+          lat: req.body.lat,
+          lng: req.body.lng,
+          isBid: true,
+          timestamp: new Date()
+        };
+        db.collection("bids").insert(post, (err, result) => {
+          if (err) {
+            res.send({ error: "An error has occurred" });
+          } else {
+            res.send(result.ops[0]);
+          }
+        });
+      }
+    });
   });
 
   // DELETE a bid where query param id = _id
@@ -82,30 +82,30 @@ module.exports = function(app, db) {
   });
 
   // PUT update an existing bid where query param id = _id
-	app.put("/bids", (req, res) => {
-		const user = req.body.owner;
-		db.collection("users").findOne({ username: user }, (err, result) => {
-			if (err) {
-				res.send({ error: "User not found" });
-			} else {
-				const post = {
-					coin: req.body.coin,
-					userId: result._id,
-					price: req.body.price,
-					volume: req.body.volume,
-					lat: req.body.lat,
-					lng: req.body.lng,
-					isBid: true,
-					timestamp: new Date()
-				};
-				db.collection("bids").update(post, (err, result) => {
-					if (err) {
-						res.send({ error: "An error has occurred" });
-					} else {
-						res.send(result.ops[0]);
-					}
-				});
-			}
-		});
-	});
+  app.put("/bids", (req, res) => {
+    const user = req.body.owner;
+    db.collection("users").findOne({ username: user }, (err, result) => {
+      if (err) {
+        res.send({ error: "User not found" });
+      } else {
+        const post = {
+          coin: req.body.coin,
+          userId: result._id,
+          price: req.body.price,
+          volume: req.body.volume,
+          lat: req.body.lat,
+          lng: req.body.lng,
+          isBid: true,
+          timestamp: new Date()
+        };
+        db.collection("bids").update(post, (err, result) => {
+          if (err) {
+            res.send({ error: "An error has occurred" });
+          } else {
+            res.send(result.ops[0]);
+          }
+        });
+      }
+    });
+  });
 };

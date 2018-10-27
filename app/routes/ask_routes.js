@@ -2,6 +2,7 @@ const ObjectID = require('mongodb').ObjectID;
 
 module.exports = function(app, db) {
 
+	// GET all asks
     app.get('/asks', (req, res) => {
         db.collection('asks').find({}, (err, data) => {
             if (err) {
@@ -14,6 +15,7 @@ module.exports = function(app, db) {
         });
     });
 
+		// GET an ask where query param id = _id
     app.get('/ask', (req, res) => {
         const details = { '_id':  new ObjectID(req.query.id) };
             db.collection('asks').findOne(details, (err, item) => {
@@ -25,19 +27,17 @@ module.exports = function(app, db) {
             });
         });
 
+		// POST a new ask
     app.post('/asks', (req, res) => {
         const post = {
 					coin: req.body.coin,
 					owner: req.body.owner,
-					// location: req.body.location,
-					timestamp: new Date(),
-					// message: req.body.message,
 					price: req.body.price,
 					volume: req.body.volume,
-					// contact: req.body.contact,
 					lat: req.body.lat,
 					lng: req.body.lng,
-        };
+					timestamp: new Date(),
+				};
         db.collection('asks').insert(post, (err, result) => {
             if (err) {
                 res.send({ 'error': 'An error has occurred' });
@@ -47,6 +47,7 @@ module.exports = function(app, db) {
         });
     });
 
+		// DELETE an ask where query param id = _id
     app.delete('/ask', (req, res) => {
         const id = req.query.id;
         const details = { '_id': new ObjectID(id) };
@@ -59,21 +60,19 @@ module.exports = function(app, db) {
         });
     });
 
+		// PUT update an existing ask where query param id = _id
     app.put('/ask', (req, res) => {
         const id = req.query.id;
         const details = { '_id': new ObjectID(id) };
         const post = {
 					coin: req.body.coin,
 					owner: req.body.owner,
-					// location: req.body.location,
-					timestamp: new Date(),
-					// message: req.body.message,
 					price: req.body.price,
 					volume: req.body.volume,
-					// contact: req.body.contact,
 					lat: req.body.lat,
 					lng: req.body.lng,
-        };
+					timestamp: new Date(),
+				};
         db.collection('asks').update(details, post, (err, result) => {
             if (err) {
                 res.send({'error':'An error has occurred'});

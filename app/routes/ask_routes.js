@@ -69,14 +69,13 @@ module.exports = function(app, db) {
   });
 
   // DELETE an ask where query param id = _id
-  app.delete("/ask", (req, res) => {
-    const id = req.query.id;
-    const details = { _id: new ObjectID(id) };
+  app.delete("/ask/:id", (req, res) => {
+		const details = { _id: new ObjectID(req.params.id) };
     db.collection("asks").remove(details, (err, item) => {
       if (err) {
         res.send({ error: "An error has occurred" });
       } else {
-        res.send("Post " + id + " deleted!");
+				return res.status(200)
       }
     });
   });

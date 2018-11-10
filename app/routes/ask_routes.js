@@ -1,4 +1,5 @@
 const ObjectID = require("mongodb").ObjectID;
+const request = require("request");
 
 module.exports = function(app, db) {
   // GET all asks
@@ -47,23 +48,28 @@ module.exports = function(app, db) {
       if (err) {
         res.send({ error: "User not found" });
       } else {
-        const post = {
-          coin: req.body.coin,
-          userId: result._id,
-          price: req.body.price,
-          volume: req.body.volume,
-          lat: req.body.lat,
-          lng: req.body.lng,
-          isBid: false,
-          timestamp: new Date()
-        };
-        db.collection("asks").insert(post, (err, result) => {
-          if (err) {
-            res.send({ error: "An error has occurred" });
-          } else {
-            res.send(result.ops[0]);
-          }
-        });
+        const URL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${req.body.lat},${req.body.lng}&key=${process.env.GOOGLE_MAPS_KEY}`;
+        request(URL, { json: true }, (err, resp, body) => {
+          if (err) { return console.log(err); }
+          const post = {
+            coin: req.body.coin,
+            userId: result._id,
+            price: req.body.price,
+            volume: req.body.volume,
+            lat: req.body.lat,
+            lng: req.body.lng,
+            isBid: false,
+            timestamp: new Date(),
+            location: body.results[0].address_components
+          };
+          db.collection("asks").insert(post, (err, result) => {
+            if (err) {
+              res.send({ error: "An error has occurred" });
+            } else {
+              res.send(result.ops[0]);
+            }
+          });
+        })
       }
     });
   });

@@ -54,6 +54,7 @@ module.exports = function(app, db) {
           const post = {
             coin: req.body.coin,
             userId: result._id,
+            owner: user,
             price: req.body.price,
             volume: req.body.volume,
             lat: req.body.lat,

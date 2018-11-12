@@ -38,7 +38,7 @@ module.exports = function(app, db) {
     const details = {_id: new ObjectID(req.params.id)};
 
     // get the ask from the id
-    Asks.findOne(details, (err, ask) => {
+    Asks.find(details, (err, ask) => {
       if (err) {
         res.send({error: "Could not find ask"});
       } else {
@@ -64,7 +64,7 @@ module.exports = function(app, db) {
     const details = {_id: new ObjectID(req.params.id)};
 
     // get the ask from the id
-    Bids.findOne(details, (err, bid) => {
+    Bids.find(details, (err, bid) => {
       if (err) {
         res.send({error: "Could not find bid"});
       } else {
@@ -97,14 +97,14 @@ module.exports = function(app, db) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
-          volume: req.body.volume,
-          userId: req.body.userId,
-          owner: req.body.owner,
-          price: req.body.price,
-          coin: req.body.coin,
+          volume: post.volume,
+          userId: post.userId.toString(),
+          owner: post.owner,
+          price: post.price,
+          coin: post.coin,
           bid: true,
           timestamp: new Date(),
-          postId: req.body.postId,
+          postId,
           status: "PENDING"
         };
 
@@ -141,14 +141,14 @@ module.exports = function(app, db) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
-          volume: req.body.volume,
-          userId: req.body.userId,
-          owner: req.body.owner,
-          price: req.body.price,
-          coin: req.body.coin,
+          volume: post.volume,
+          userId: post.userId.toString(),
+          owner: post.owner,
+          price: post.price,
+          coin: post.coin,
           bid: false,
           timestamp: new Date(),
-          postId: req.body.postId,
+          postId,
           status: "PENDING"
         };
 

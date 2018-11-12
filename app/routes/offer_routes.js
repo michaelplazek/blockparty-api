@@ -20,6 +20,20 @@ module.exports = function(app, db) {
     });
   });
 
+  // GET total offers by a user by userId
+  app.get("/offers_by_user/:id", (req, res) => {
+    const details = { userId: new ObjectID(req.params.id) };
+    db.collection("offers").find(details, (err, data) => {
+      if (err) {
+        res.send({ error: "An error has occurred" });
+      } else {
+        data.toArray((err, datum) => {
+          res.send(datum);
+        });
+      }
+    });
+  });
+
   // GET total offers for a ask by id
   app.get("/offers_by_ask/:id", (req, res) => {
     const details = {_id: new ObjectID(req.params.id)};

@@ -59,9 +59,10 @@ module.exports = function(app, db) {
             volume: req.body.volume,
             lat: req.body.lat,
             lng: req.body.lng,
-            isBid: false,
+            isBid: true,
             timestamp: new Date(),
-            location: body.results[0].address_components
+            location: body.results[0].address_components,
+            offers: []
           };
           db.collection("bids").insert(post, (err, result) => {
             if (err) {

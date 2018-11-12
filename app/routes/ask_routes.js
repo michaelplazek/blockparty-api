@@ -61,7 +61,8 @@ module.exports = function(app, db) {
             lng: req.body.lng,
             isBid: false,
             timestamp: new Date(),
-            location: body.results[0].address_components
+            location: body.results[0].address_components,
+            offers: []
           };
           db.collection("asks").insert(post, (err, result) => {
             if (err) {

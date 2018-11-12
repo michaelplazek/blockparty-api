@@ -104,7 +104,7 @@ module.exports = function(app, db) {
           bid: true,
           timestamp: new Date(),
           postId: req.body.postId,
-          accepted: false
+          status: "PENDING"
         };
 
         // create a new offer
@@ -148,7 +148,7 @@ module.exports = function(app, db) {
           bid: false,
           timestamp: new Date(),
           postId: req.body.postId,
-          accepted: false
+          status: "PENDING"
         };
 
         // create a new offer

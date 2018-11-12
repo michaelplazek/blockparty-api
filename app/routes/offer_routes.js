@@ -1,5 +1,4 @@
 const ObjectID = require("mongodb").ObjectID;
-const request = require("request");
 
 module.exports = function(app, db) {
 
@@ -22,8 +21,8 @@ module.exports = function(app, db) {
 
   // GET total offers by a user by userId
   app.get("/offers_by_user/:id", (req, res) => {
-    const details = { userId: new ObjectID(req.params.id) };
-    db.collection("offers").find(details, (err, data) => {
+    const details = { userId: req.params.id };
+    Offers.find(details, (err, data) => {
       if (err) {
         res.send({ error: "An error has occurred" });
       } else {
@@ -101,6 +100,7 @@ module.exports = function(app, db) {
           volume: req.body.volume,
           userId: req.body.userId,
           owner: req.body.owner,
+          coin: req.body.coin,
           bid: true,
           timestamp: new Date(),
           postId: req.body.postId,
@@ -144,6 +144,7 @@ module.exports = function(app, db) {
           volume: req.body.volume,
           userId: req.body.userId,
           owner: req.body.owner,
+          coin: req.body.coin,
           bid: false,
           timestamp: new Date(),
           postId: req.body.postId,

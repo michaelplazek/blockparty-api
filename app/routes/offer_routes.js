@@ -112,7 +112,6 @@ module.exports = function(app, db) {
           if (err) {
             res.send({error: "Error adding offer"});
           } else {
-            console.log(result);
             const ids = post.offers.concat(result.insertedIds[0].toString());
             const update = {$set: {offers: ids}};
 
@@ -156,7 +155,6 @@ module.exports = function(app, db) {
           if (err) {
             res.send({error: "Error adding offer"});
           } else {
-            console.log(result);
             const ids = post.offers.concat(result.insertedIds[0].toString());
             const update = {$set: {offers: ids}};
 

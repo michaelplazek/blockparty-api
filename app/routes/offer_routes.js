@@ -36,25 +36,28 @@ module.exports = function(app, db) {
   // GET total offers for a ask by id
   app.get("/offers_by_ask/:id", (req, res) => {
     const details = {_id: new ObjectID(req.params.id)};
-
+    console.log(details);
     // get the ask from the id
-    Asks.find(details, (err, ask) => {
+    Asks.find(details, (err, data) => {
       if (err) {
         res.send({error: "Could not find ask"});
       } else {
 
         // get the offer ids
-        const ids = ask.offers.map(item => new ObjectID(item));
-        const details = {_id: {$in: ids}};
-        Offers.find(details, (err, offers) => {
-          if (err) {
-            res.send({error: "Error retrieving offers"});
-          } else {
-            offers.toArray((err, datum) => {
-              res.send(datum);
-            });
-          }
-        })
+        data.toArray((err, ask) => {
+          console.log(ask);
+          const ids = ask[0].offers.map(item => new ObjectID(item));
+          const details = {_id: {$in: ids}};
+          Offers.find(details, (err, offers) => {
+            if (err) {
+              res.send({error: "Error retrieving offers"});
+            } else {
+              offers.toArray((err, datum) => {
+                res.send(datum);
+              });
+            }
+          })
+        });
       }
     });
   });
@@ -70,7 +73,6 @@ module.exports = function(app, db) {
       } else {
 
         // get the offer ids
-        console.log(bid);
         const ids = bid.offers.map(item => new ObjectID(item));
         const details = {_id: {$in: ids}};
         Offers.find(details, (err, offers) => {

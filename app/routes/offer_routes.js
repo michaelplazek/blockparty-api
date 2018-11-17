@@ -36,7 +36,6 @@ module.exports = function(app, db) {
   // GET total offers for a ask by id
   app.get("/offers_by_ask/:id", (req, res) => {
     const details = {_id: new ObjectID(req.params.id)};
-    console.log(details);
     // get the ask from the id
     Asks.find(details, (err, data) => {
       if (err) {
@@ -45,7 +44,6 @@ module.exports = function(app, db) {
 
         // get the offer ids
         data.toArray((err, ask) => {
-          console.log(ask);
           const ids = ask[0].offers.map(item => new ObjectID(item));
           const details = {_id: {$in: ids}};
           Offers.find(details, (err, offers) => {

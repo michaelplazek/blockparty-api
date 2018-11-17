@@ -102,10 +102,11 @@ module.exports = function(app, db) {
           owner: post.owner,
           price: post.price,
           coin: post.coin,
+          contactInfo: post.contactInfo,
           bid: true,
           timestamp: new Date(),
           postId,
-          status: "PENDING"
+          status: "PENDING",
         };
 
         // create a new offer
@@ -146,6 +147,7 @@ module.exports = function(app, db) {
           owner: post.owner,
           price: post.price,
           coin: post.coin,
+          contactInfo: post.contactInfo,
           bid: false,
           timestamp: new Date(),
           postId,

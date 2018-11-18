@@ -99,12 +99,12 @@ module.exports = function(app, db) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
-          volume: post.volume,
-          userId: post.userId.toString(),
+          volume: req.body.volume,
+          userId: req.body.userId.toString(),
           owner: post.owner,
           price: post.price,
           coin: post.coin,
-          contactInfo: post.contactInfo,
+          contactInfo: req.body.contactInfo,
           bid: true,
           timestamp: new Date(),
           postId,
@@ -144,12 +144,12 @@ module.exports = function(app, db) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
-          volume: post.volume,
-          userId: post.userId.toString(),
+          volume: req.body.volume,
+          userId: req.body.userId.toString(),
           owner: post.owner,
           price: post.price,
           coin: post.coin,
-          contactInfo: post.contactInfo,
+          contactInfo: req.body.contactInfo,
           bid: false,
           timestamp: new Date(),
           postId,
@@ -163,6 +163,7 @@ module.exports = function(app, db) {
           } else {
             const ids = post.offers.concat(result.insertedIds[0].toString());
             const update = {$set: {offers: ids}};
+            console.log(offer);
 
             // update the list of offer ids for the post
             Asks.update(details, update, (err, _) => {

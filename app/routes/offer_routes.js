@@ -65,23 +65,25 @@ module.exports = function(app, db) {
     const details = {_id: new ObjectID(req.params.id)};
 
     // get the ask from the id
-    Bids.find(details, (err, bid) => {
+    Bids.find(details, (err, data) => {
       if (err) {
         res.send({error: "Could not find bid"});
       } else {
 
         // get the offer ids
-        const ids = bid.offers.map(item => new ObjectID(item));
-        const details = {_id: {$in: ids}};
-        Offers.find(details, (err, offers) => {
-          if (err) {
-            res.send({error: "Error retrieving offers"});
-          } else {
-            offers.toArray((err, datum) => {
-              res.send(datum);
-            });
-          }
-        })
+        data.toArray((err, bid) => {
+          const ids = bid[0].offers.map(item => new ObjectID(item));
+          const details = {_id: {$in: ids}};
+          Offers.find(details, (err, offers) => {
+            if (err) {
+              res.send({error: "Error retrieving offers"});
+            } else {
+              offers.toArray((err, datum) => {
+                res.send(datum);
+              });
+            }
+          })
+        });
       }
     });
   });
@@ -179,7 +181,6 @@ module.exports = function(app, db) {
   // DELETE a offer where query param id = _id
   app.delete("/offers/:id", (req, res) => {
     const details = {_id: new ObjectID(req.params.id)};
-    console.log('inside');
     Offers.remove(details, (err, item) => {
       if (err) {
         res.send({error: "An error has occurred"});

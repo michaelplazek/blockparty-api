@@ -211,13 +211,21 @@ module.exports = function(app, db) {
         return obj;
       }, {});
     const update = {$set: updates};
-    Offers.updateOne(details, update, (err, offer) => {
+    Offers.findOneAndUpdate(details, update, {returnOriginal: true}, (err, offer) => {
       if(err) return res.send({ error: 'Could not update offer' });
       else {
-        return res.send({ offer });
+
+        console.log(offer);
+        // remove the offer from the post
+        const update = {$pull: {offers: offer.value._id.toString()}};
+        const details = { _id: new ObjectID(offer.value.postId) };
+        const Store = offer.value.bid ? Bids : Asks;
+        Store.updateOne(details, update, (err, response) => {
+          if(err) return res.send({error: "Error updating post offers"});
+          else return res.send({ offer: offer.value });
+        });
       }
     });
   });
-
 };
 

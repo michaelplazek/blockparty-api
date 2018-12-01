@@ -2,6 +2,9 @@ const ObjectID = require("mongodb").ObjectID;
 const request = require("request");
 
 module.exports = function(app, db) {
+
+  const Asks = db.collection("asks");
+
   // GET all asks
   app.get("/asks", (req, res) => {
     db.collection("asks").find({}, (err, data) => {

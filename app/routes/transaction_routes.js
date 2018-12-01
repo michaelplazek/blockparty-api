@@ -4,45 +4,57 @@ module.exports = function(app, db) {
 
   const Users = db.collection("users");
   const Offers = db.collection("offers");
+  const Asks = db.collection("asks");
+  const Bids = db.collection("bids");
   const Transactions = db.collection("transactions");
 
-  // POST a new transaction
-  app.post("/ask_offers", (req, res) => {
-    const {postId} = req.body;
-    const details = {_id: new ObjectID(postId)};
+  // POST a new transaction based on an offer id
+  app.post("/transaction", (req, res) => {
+    const { offerId } = req.body;
+    const offerDetails = {_id: new ObjectID(offerId)};
 
-    // get the ask or bid from the _id
-    Asks.findOne(details, (err, post) => {
-      if (err) {
-        res.send({error: "Post not found"});
-      } else {
-        const offer = {
-          volume: req.body.volume,
-          userId: req.body.userId.toString(),
-          owner: post.owner,
-          price: post.price,
-          coin: post.coin,
-          contactInfo: req.body.contactInfo,
-          bid: false,
-          timestamp: new Date(),
-          postId,
-          status: "PENDING"
-        };
+    // find offer with corresponding id
+    Offers.findOne(offerDetails, (err, offer) => {
+      if (err) return res.send({ error: 'Offer not found' });
+      else {
 
-        // create a new offer
-        Offers.insert(offer, (err, result) => {
-          if (err) {
-            res.send({error: "Error adding offer"});
-          } else {
-            const ids = post.offers.concat(result.insertedIds[0].toString());
-            const update = {$set: {offers: ids}};
+        // get the associated ask or bid
+        const Store = offer.bid ? Bids : Asks;
+        const postDetails = {_id: new ObjectID(offer.postId)};
+        Store.findOne(postDetails, (err, post) => {
+          if(err) return res.send({ error: 'Post not found' });
+          else {
 
-            // update the list of offer ids for the post
-            Asks.update(details, update, (err, _) => {
-              if (err) {
-                res.send({error: "Error updating post offers"});
-              } else {
-                res.send(result.ops[0]);
+            // create the transaction
+            const transaction = {
+              sellerId: offer.bid ? offer.userId : post.userId.toString(),
+              sellerUsername: offer.bid ? req.body.owner : post.owner,
+              buyerId: offer.bid ? post.userId.toString() : offer.userId,
+              buyerUsername: offer.bid ? post.owner : req.body.owner,
+              coin: offer.coin,
+              volume: offer.volume,
+              price: post.price,
+              contactInfo: offer.contactInfo
+            };
+            Transactions.insertOne(transaction, (err, result) => {
+              if(err) return res.send({ error: 'Transaction could not be created' });
+              else {
+
+                // deletes the offer
+                Offers.removeOne(offerDetails, (err, result) => {
+                  if(err) return res.send({ error: 'Offer could not be deleted' });
+                  else {
+
+                    // post is set to accepted for filtering
+                    const postUpdates = {$set: {isAccepted: true}};
+                    Store.updateOne(postDetails, postUpdates, (err, result) => {
+                      if(err) return res.send({ error: 'Post could not be updated' });
+                      else {
+                        return res.status(200);
+                      }
+                    })
+                  }
+                })
               }
             });
           }

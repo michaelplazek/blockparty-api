@@ -50,7 +50,13 @@ module.exports = function(app, db) {
                     Store.updateOne(postDetails, postUpdates, (err, result) => {
                       if(err) return res.send({ error: 'Post could not be updated' });
                       else {
-                        return res.status(200);
+
+                        // remove the offer from the post
+                        const offerUpdate = {$pull: {offers: req.params.id}};
+                        Store.updateOne(postDetails, offerUpdate, (err, _) => {
+                          if(err) return res.send({error: "Error updating post offers"});
+                          else return res.status(200);
+                        });
                       }
                     })
                   }

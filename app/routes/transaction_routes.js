@@ -4,8 +4,7 @@ module.exports = function(app, db) {
 
   const Users = db.collection("users");
   const Offers = db.collection("offers");
-  const Bids = db.collection("bids");
-  const Asks = db.collection("asks");
+  const Transactions = db.collection("transactions");
 
   // GET an offer where query param id = _id
   app.get("/offer", (req, res) => {
@@ -178,26 +177,15 @@ module.exports = function(app, db) {
     });
   });
 
-  // DELETE an offer where query param id = _id
+  // DELETE a offer where query param id = _id
   app.delete("/offers/:id", (req, res) => {
     const details = {_id: new ObjectID(req.params.id)};
-    Offers.findOne(details, (err, offer) => {
+    Offers.remove(details, (err, item) => {
       if (err) {
         res.send({error: "An error has occurred"});
       } else {
-        Offers.remove(details, (err, _) => {
-          const Store = offer.bid ? Bids : Asks;
-          const _id = new ObjectID(offer.postId);
-          const details = { _id };
-          console.log(offer);
-          const update = {$pull: {offers: req.params.id}};
-          Store.update(details, update, (err, _) => {
-            if(err) return res.send({error: "Error updating post offers"});
-            else return res.status(200);
-          });
-        });
+        return res.status(200)
       }
     });
   })
 };
-

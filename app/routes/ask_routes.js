@@ -60,6 +60,7 @@ module.exports = function(app, db) {
             lat: req.body.lat,
             lng: req.body.lng,
             isBid: false,
+            isAccepted: false,
             timestamp: new Date(),
             location: body.results[0].address_components,
             offers: []
@@ -103,6 +104,7 @@ module.exports = function(app, db) {
           lat: req.body.lat,
           lng: req.body.lng,
           isBid: false,
+          isAccepted: false,
           timestamp: new Date()
         };
         db.collection("asks").update(post, (err, result) => {

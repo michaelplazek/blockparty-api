@@ -214,7 +214,7 @@ module.exports = function(app, db) {
     Offers.updateOne(details, update, (err, offer) => {
       if(err) return res.send({ error: 'Could not update offer' });
       else {
-        return res.status(201)
+        return res.send({ offer });
       }
     });
   });

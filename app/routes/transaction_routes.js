@@ -68,4 +68,26 @@ module.exports = function(app, db) {
       }
     });
   });
+
+  // GET transactions based on a user id
+  app.get('/transactions/:userId', (req, res) => {
+    const details = { sellerId: req.params.userId };
+    Transactions.find(details, (err, sellers) => {
+      if(err) return res.send({ error: 'Error getting transactions' });
+      else {
+        sellers.toArray((err, sellerArray) => {
+          const details = { buyerId: req.params.userId };
+          Transactions.find(details, (err, buyers) => {
+            if(err) return res.send({ error: 'Error getting transactions' });
+            else {
+              buyers.toArray((err, buyerArray) => {
+                const result = sellerArray.concat(buyerArray);
+                return res.send(result);
+              })
+            }
+          });
+        });
+      }
+    });
+  });
 };

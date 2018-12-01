@@ -36,7 +36,7 @@ module.exports = function(app, db) {
               price: post.price,
               contactInfo: offer.contactInfo
             };
-            Transactions.insertOne(transaction, (err, result) => {
+            Transactions.insertOne(transaction, (err, transactionResponse) => {
               if(err) return res.send({ error: 'Transaction could not be created' });
               else {
 
@@ -55,7 +55,7 @@ module.exports = function(app, db) {
                         const offerUpdate = {$pull: {offers: req.params.id}};
                         Store.updateOne(postDetails, offerUpdate, (err, _) => {
                           if(err) return res.send({error: "Error updating post offers"});
-                          else return res.status(200);
+                          else return res.send(transactionResponse);
                         });
                       }
                     })

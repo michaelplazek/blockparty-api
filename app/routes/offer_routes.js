@@ -198,6 +198,26 @@ module.exports = function(app, db) {
         });
       }
     });
-  })
+  });
+
+  // UPDATE an offer with id
+  app.patch("/offer", (req, res) => {
+    const { id } = req.body;
+    const details = {_id: new ObjectID(id)};
+    const updates = Object.keys(req.body)
+      .filter(key => key !== "id")
+      .reduce((obj, key) => {
+        obj[key] = req.body[key];
+        return obj;
+      }, {});
+    const update = {$set: updates};
+    Offers.updateOne(details, update, (err, offer) => {
+      if(err) return res.send({ error: 'Could not update offer' });
+      else {
+        return res.status(201)
+      }
+    });
+  });
+
 };
 

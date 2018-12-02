@@ -56,7 +56,7 @@ module.exports = function(app, db) {
                       else {
 
                         // remove the offer from the post
-                        const offerUpdate = {$pull: {offers: req.params.id}};
+                        const offerUpdate = {$pull: {offers: offerId}};
                         Store.updateOne(postDetails, offerUpdate, (err, _) => {
                           if(err) return res.send({error: "Error updating post offers"});
                           else return res.send(transactionResponse);
@@ -146,6 +146,36 @@ module.exports = function(app, db) {
       }
     })
   });
+
+  app.post("/transaction_cancelled", (req, res) => {
+    const { id } = req.body;
+    const transactionDetails = {_id: new ObjectID(id)};
+
+    // get transaction from id
+    Transactions.findOne(transactionDetails, (err, transaction) => {
+      if (err) return res.send({error: "Could not find transaction"});
+      else {
+        const { postId, bid } = transaction;
+        const postDetails = { _id: new ObjectID(postId) };
+        const updates = {$set: {isAccepted: false}};
+        const Store = bid ? Bids : Asks;
+        Store.findOneAndUpdate(postDetails, updates, (err, post) => {
+          if(err) return res.send({ error: 'Could not find post' });
+          else {
+
+            // then delete the transaction
+            Transactions.removeOne(transactionDetails, (err, response) => {
+              if(err) return res.send({ error: 'Could not delete transaction' });
+              else {
+                return res.send(post.value);
+              }
+            });
+          }
+        });
+      }
+    });
+  });
+
 
   // GET transactions based on a user id
   app.get('/transactions/:userId', (req, res) => {

@@ -90,7 +90,7 @@ module.exports = function(app, db) {
 
   // POST a new bid offer
   app.post("/bid_offers", (req, res) => {
-    const {postId} = req.body;
+    const {postId, userId, volume, contactInfo, username} = req.body;
     const details = {_id: new ObjectID(postId)};
 
     // get the ask or bid from the _id
@@ -99,12 +99,13 @@ module.exports = function(app, db) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
-          volume: req.body.volume,
-          userId: req.body.userId.toString(),
+          volume: volume,
+          userId: userId.toString(),
+          username,
           owner: post.owner,
           price: post.price,
           coin: post.coin,
-          contactInfo: req.body.contactInfo,
+          contactInfo: contactInfo,
           bid: true,
           timestamp: new Date(),
           postId,
@@ -135,7 +136,7 @@ module.exports = function(app, db) {
 
   // POST a new ask offer
   app.post("/ask_offers", (req, res) => {
-    const {postId} = req.body;
+    const {postId, userId, volume, contactInfo, username} = req.body;
     const details = {_id: new ObjectID(postId)};
 
     // get the ask or bid from the _id
@@ -144,12 +145,13 @@ module.exports = function(app, db) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
-          volume: req.body.volume,
-          userId: req.body.userId.toString(),
+          volume,
+          userId: userId.toString(),
+          username,
           owner: post.owner,
           price: post.price,
           coin: post.coin,
-          contactInfo: req.body.contactInfo,
+          contactInfo,
           bid: false,
           timestamp: new Date(),
           postId,

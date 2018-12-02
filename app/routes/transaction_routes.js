@@ -34,7 +34,11 @@ module.exports = function(app, db) {
               coin: offer.coin,
               volume: offer.volume,
               price: post.price,
-              contactInfo: offer.contactInfo
+              contactInfo: offer.contactInfo,
+              postId: offer.postId,
+              bid: offer.bid,
+              completedBySeller: false,
+              completedByBuyer: false
             };
             Transactions.insertOne(transaction, (err, transactionResponse) => {
               if(err) return res.send({ error: 'Transaction could not be created' });
@@ -69,6 +73,80 @@ module.exports = function(app, db) {
     });
   });
 
+  app.post("/transaction_complete", (req, res) => {
+    const { id, userId } = req.body;
+    const transactionDetails = {_id: new ObjectID(id)};
+
+    // find the corresponding transaction
+    Transactions.findOne(transactionDetails, (err, transaction) => {
+      if(err) return res.send({ error: "Could not find transaction" });
+      else {
+
+        // find out whether its the seller or buyer
+        const position = userId === transaction.sellerId ? "completedBySeller" : "completedByBuyer";
+
+        // mark as completed
+        const updates = {$set: { [position]: true }};
+        Transactions.findOneAndUpdate(transactionDetails, updates, {returnOriginal: false}, (err, response) => {
+          if(err) return res.send({ error: 'Could not update transaction' });
+          else {
+
+            // see if both users have marked it as complete
+            const complete = response.value.completedByBuyer && response.value.completedBySeller;
+            if (complete) {
+
+              // get the original post and set isAccepted to false
+              const Store = response.value.bid ? Bids : Asks;
+              const postDetails = { _id: new ObjectID(response.value.postId) };
+              const updates = {$set: {isAccepted: false, offers: []}};
+              Store.findOneAndUpdate(postDetails, updates, {returnOriginal: true}, (err, post) => {
+                if(err) return res.send({ error: 'Could not find post' });
+                else {
+
+                  // see if the offer volume was less than the total volume
+                  const offerVolume = transaction.volume;
+                  const totalVolume = post.value.volume;
+                  const lessThan = offerVolume < totalVolume;
+                  const difference = totalVolume - offerVolume;
+
+                  // we can just subtract the value from the post
+                  if(lessThan){
+                    const updates = {$set: {volume: difference}};
+                    Store.updateOne(postDetails, updates, (err, response) => {
+                      if(err) return res.send({ error: 'Could not find post' });
+                    });
+                  } else { // otherwise, we can just delete the post
+                    Store.deleteOne(postDetails, (err, response) => {
+                      if(err) return res.send({ error: 'Could not find post' });
+                    });
+                  }
+
+                  // now we need to delete remaining offers
+                  const offers = post.value.offers.map(item => new ObjectID(item));
+                  Offers.removeMany({'_id':{'$in': offers}}, (err, response) => {
+                    if(err) return res.send({ error: "Could not delete offers" });
+                    else {
+
+                      // now delete the transaction
+                      Transactions.removeOne(transactionDetails, (err, response) => {
+                        if(err) return res.send({ error: "Could not delete the transaction" });
+                        else {
+                          return res.send(response);
+                        }
+                      });
+                    }
+                  });
+                }
+              })
+            } else {
+              return res.send(response.value);
+            }
+          }
+        })
+      }
+    })
+  });
+
   // GET transactions based on a user id
   app.get('/transactions/:userId', (req, res) => {
     const details = { sellerId: req.params.userId };
@@ -89,5 +167,16 @@ module.exports = function(app, db) {
         });
       }
     });
+  });
+
+  // GET transaction based on id
+  app.get("/transaction/:id", (req, res) => {
+    const details = { _id: new ObjectID(req.params.id) };
+    Transactions.findOne(details, (err, transaction) => {
+      if (err) return res.send({ error: 'Could not find transaction' });
+      else {
+        return res.send(transaction);
+      }
+    })
   });
 };

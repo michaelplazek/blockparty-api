@@ -23,7 +23,8 @@ module.exports = function(app, db) {
         const token = generateToken(user);
         res.json({
           user: user,
-          token: token
+          token: token,
+          id: user._id.toString()
         });
       }
     });
@@ -46,7 +47,8 @@ module.exports = function(app, db) {
           const token = generateToken(user);
           res.json({
             user: user,
-            token: token
+            token: token,
+            id: user._id.toString()
           });
         } else {
           return res.status(404).json({

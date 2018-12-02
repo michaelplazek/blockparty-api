@@ -32,7 +32,7 @@ module.exports = function(app, db) {
 
   // GET total bids by a user by userId
   app.get("/bids/:userId", (req, res) => {
-    const details = { userId: new ObjectID(req.params.userId) };
+    const details = { userId: req.params.userId };
     db.collection("bids").find(details, (err, data) => {
       if (err) {
         res.send({ error: "An error has occurred" });
@@ -56,7 +56,7 @@ module.exports = function(app, db) {
           if (err) { return console.log(err); }
           const post = {
             coin: req.body.coin,
-            userId: result._id,
+            userId: result._id.toString(),
             owner: user,
             price: req.body.price,
             volume: req.body.volume,
@@ -101,7 +101,7 @@ module.exports = function(app, db) {
       } else {
         const post = {
           coin: req.body.coin,
-          userId: result._id,
+          userId: result._id.toString(),
           price: req.body.price,
           volume: req.body.volume,
           lat: req.body.lat,

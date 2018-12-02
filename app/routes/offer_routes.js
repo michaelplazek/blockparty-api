@@ -179,7 +179,7 @@ module.exports = function(app, db) {
   });
 
   // DELETE an offer where query param id = _id
-  app.delete("/offers/:id", (req, res) => {
+  app.delete("/offer/:id", (req, res) => {
     const details = {_id: new ObjectID(req.params.id)};
     Offers.findOne(details, (err, offer) => {
       if (err) {
@@ -189,11 +189,10 @@ module.exports = function(app, db) {
           const Store = offer.bid ? Bids : Asks;
           const _id = new ObjectID(offer.postId);
           const details = { _id };
-          console.log(offer);
           const update = {$pull: {offers: req.params.id}};
-          Store.update(details, update, (err, _) => {
+          Store.update(details, update, (err, response) => {
             if(err) return res.send({error: "Error updating post offers"});
-            else return res.status(200);
+            else return res.send(response);
           });
         });
       }
@@ -215,7 +214,6 @@ module.exports = function(app, db) {
       if(err) return res.send({ error: 'Could not update offer' });
       else {
 
-        console.log(offer);
         // remove the offer from the post
         const update = {$pull: {offers: offer.value._id.toString()}};
         const details = { _id: new ObjectID(offer.value.postId) };

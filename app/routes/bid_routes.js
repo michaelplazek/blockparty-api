@@ -83,11 +83,11 @@ module.exports = function(app, db) {
   // DELETE a bid where query param id = _id
   app.delete("/bid/:id", (req, res) => {
 		const details = { _id: new ObjectID(req.params.id) };
-		db.collection("bids").remove(details, (err, item) => {
+		Bids.remove(details, (err, item) => {
 			if (err) {
 				res.send({ error: "An error has occurred" });
 			} else {
-				return res.status(200)
+				return res.send(item)
 			}
 		});
   });

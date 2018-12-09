@@ -25,10 +25,6 @@ module.exports = function(app, db) {
           if(err) return res.send({ error: 'Post not found' });
           else {
 
-            console.log(offer);
-            console.log(post);
-            console.log(req.body);
-
             // create the transaction
             const transaction = {
               sellerId: offer.bid ? offer.userId : post.userId.toString(),

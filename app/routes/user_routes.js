@@ -17,6 +17,7 @@ module.exports = function(app, db) {
       username: req.body.username,
       password: req.body.password,
       created: new Date(),
+      bio: "This is my bio",
       completedTransactions: 0,
       cancelledTransactions: 0
     };

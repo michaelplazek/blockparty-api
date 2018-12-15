@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const omit = require('lodash/omit');
 const ObjectID = require("mongodb").ObjectID;
 
 function generateToken(user) {
@@ -12,6 +13,9 @@ function generateToken(user) {
 }
 
 module.exports = function(app, db) {
+
+  const Users = db.collection("users");
+
   app.post("/users/signup", (req, res, next) => {
     const user = {
       username: req.body.username,
@@ -21,7 +25,7 @@ module.exports = function(app, db) {
       completedTransactions: 0,
       cancelledTransactions: 0
     };
-    db.collection("users").insert(user, err => {
+    Users.insert(user, err => {
       if (err) throw err;
       else {
         const token = generateToken(user);
@@ -35,7 +39,7 @@ module.exports = function(app, db) {
   });
 
   app.post("/users/login", (req, res) => {
-    db.collection("users").findOne(
+    Users.findOne(
       { username: req.body.username },
       (err, user) => {
         if (err) throw err;
@@ -74,7 +78,7 @@ module.exports = function(app, db) {
 
     jwt.verify(token, process.env.SESSION_SECRET, function(err, user) {
       if (err) throw err;
-      db.collection("users").findOne(
+      Users.findOne(
         { _id: new ObjectID(user._id) },
         (err, item) => {
           if (err) throw err;
@@ -90,5 +94,19 @@ module.exports = function(app, db) {
   app.get("/users/logout", function(req, res) {
     req.session.reset();
     res.redirect("/");
+  });
+
+  // UPDATE an existing using where _id = id
+  app.put("/user", (req, res) => {
+    const details = { _id: new ObjectID(req.body.id) };
+    const items = omit(req.body, ['id']);
+    const updates = {$set: items};
+    Users.updateOne(details, updates, (err, item) => {
+      if (err) {
+        res.send({ error: "An error has occurred" });
+      } else {
+        return res.send(item)
+      }
+    });
   });
 };

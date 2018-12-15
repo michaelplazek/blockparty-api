@@ -96,50 +96,70 @@ module.exports = function(app, db) {
             const complete = response.value.completedByBuyer && response.value.completedBySeller;
             if (complete) {
 
-              // get the original post and set isAccepted to false
-              const Store = response.value.bid ? Bids : Asks;
-              const postDetails = { _id: new ObjectID(response.value.postId) };
-              const updates = {$set: {isAccepted: false, offers: []}};
-              Store.findOneAndUpdate(postDetails, updates, {returnOriginal: true}, (err, post) => {
-                if(err) return res.send({ error: 'Could not find post' });
+              console.log(transaction);
+
+              // increment both parties completed transactions and reputation
+              const userDetails =  {
+                _id: {
+                  $in: [new ObjectID(transaction.sellerId), new ObjectID(transaction.buyerId)]
+                }
+              };
+              const userUpdate = { $inc: { completedTransactions: 1 } };
+              Users.updateMany(userDetails, userUpdate, (err, users) => {
+
+                if(err) return res.send({ error: "Could not update users" });
                 else {
 
-                  // see if the offer volume was less than the total volume
-                  const offerVolume = transaction.volume;
-                  const totalVolume = post.value.volume;
-                  const lessThan = offerVolume < totalVolume;
-                  const difference = totalVolume - offerVolume;
-
-                  // we can just subtract the value from the post
-                  if(lessThan){
-                    const updates = {$set: {volume: difference}};
-                    Store.updateOne(postDetails, updates, (err, response) => {
-                      if(err) return res.send({ error: 'Could not find post' });
-                    });
-                  } else { // otherwise, we can just delete the post
-                    Store.deleteOne(postDetails, (err, response) => {
-                      if(err) return res.send({ error: 'Could not find post' });
-                    });
-                  }
-
-                  // now we need to delete remaining offers
-                  const offers = post.value.offers.map(item => new ObjectID(item));
-                  Offers.removeMany({'_id':{'$in': offers}}, (err, response) => {
-                    if(err) return res.send({ error: "Could not delete offers" });
+                  // get the original post and set isAccepted to false
+                  const Store = response.value.bid ? Bids : Asks;
+                  const postDetails = { _id: new ObjectID(response.value.postId) };
+                  const updates = {$set: {isAccepted: false, offers: []}};
+                  Store.findOneAndUpdate(postDetails, updates, {returnOriginal: true}, (err, post) => {
+                    if(err) return res.send({ error: 'Could not find post' });
                     else {
 
-                      // now delete the transaction
-                      Transactions.removeOne(transactionDetails, (err, response) => {
-                        if(err) return res.send({ error: "Could not delete the transaction" });
+                      // see if the offer volume was less than the total volume
+                      const offerVolume = transaction.volume;
+                      const totalVolume = post.value.volume;
+                      const lessThan = offerVolume < totalVolume;
+                      const difference = totalVolume - offerVolume;
+
+                      // we can just subtract the value from the post
+                      if(lessThan){
+                        const updates = {$set: {volume: difference}};
+                        Store.updateOne(postDetails, updates, (err, response) => {
+                          if(err) return res.send({ error: 'Could not find post' });
+                        });
+                      } else { // otherwise, we can just delete the post
+                        Store.deleteOne(postDetails, (err, response) => {
+                          if(err) return res.send({ error: 'Could not find post' });
+                        });
+                      }
+
+                      // now we need to delete remaining offers
+                      const offers = post.value.offers.map(item => new ObjectID(item));
+                      Offers.removeMany({'_id':{'$in': offers}}, (err, response) => {
+                        if(err) return res.send({ error: "Could not delete offers" });
                         else {
-                          return res.send(response);
+
+                          // now delete the transaction
+                          Transactions.removeOne(transactionDetails, (err, response) => {
+                            if(err) return res.send({ error: "Could not delete the transaction" });
+                            else {
+
+                              // return the result if both parties marked as completed
+                              return res.send(response);
+                            }
+                          });
                         }
                       });
                     }
-                  });
+                  })
                 }
-              })
+              });
             } else {
+
+              // return the result if only one has marked as completed
               return res.send(response.value);
             }
           }

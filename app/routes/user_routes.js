@@ -18,8 +18,7 @@ module.exports = function(app, db) {
       password: req.body.password,
       created: new Date(),
       completedTransactions: 0,
-      cancelledTransactions: 0,
-      reputation: 0
+      cancelledTransactions: 0
     };
     db.collection("users").insert(user, err => {
       if (err) throw err;

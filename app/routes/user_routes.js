@@ -101,11 +101,23 @@ module.exports = function(app, db) {
     const details = { _id: new ObjectID(req.body.id) };
     const items = omit(req.body, ['id']);
     const updates = {$set: items};
-    Users.findOneAndUpdate(details, updates, (err, item) => {
+    Users.findOneAndUpdate(details, updates, {returnOriginal: false}, (err, item) => {
+      if (err) {
+        res.send({ error: "Cannot find user" });
+      } else {
+        return res.send(item.value)
+      }
+    });
+  });
+
+  // DELETE a user where query param id = _id
+  app.delete("/user/:id", (req, res) => {
+    const details = { _id: new ObjectID(req.params.id) };
+    Users.removeOne(details, (err, item) => {
       if (err) {
         res.send({ error: "An error has occurred" });
       } else {
-        return res.send(item.value)
+        return res.send(item)
       }
     });
   });

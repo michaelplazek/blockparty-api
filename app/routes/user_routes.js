@@ -101,11 +101,11 @@ module.exports = function(app, db) {
     const details = { _id: new ObjectID(req.body.id) };
     const items = omit(req.body, ['id']);
     const updates = {$set: items};
-    Users.updateOne(details, updates, (err, item) => {
+    Users.findOneAndUpdate(details, updates, (err, item) => {
       if (err) {
         res.send({ error: "An error has occurred" });
       } else {
-        return res.send(item)
+        return res.send(item.value)
       }
     });
   });

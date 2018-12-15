@@ -15,7 +15,11 @@ module.exports = function(app, db) {
   app.post("/users/signup", (req, res, next) => {
     const user = {
       username: req.body.username,
-      password: req.body.password
+      password: req.body.password,
+      created: new Date(),
+      completedTransactions: 0,
+      cancelledTransactions: 0,
+      reputation: 0
     };
     db.collection("users").insert(user, err => {
       if (err) throw err;

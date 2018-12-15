@@ -98,7 +98,7 @@ module.exports = function(app, db) {
 
               console.log(transaction);
 
-              // increment both parties completed transactions and reputation
+              // increment both parties completed transactions
               const userDetails =  {
                 _id: {
                   $in: [new ObjectID(transaction.sellerId), new ObjectID(transaction.buyerId)]
@@ -184,12 +184,23 @@ module.exports = function(app, db) {
           if(err) return res.send({ error: 'Could not find post' });
           else {
 
-            // then delete the transaction
-            Transactions.removeOne(transactionDetails, (err, response) => {
-              if(err) return res.send({ error: 'Could not delete transaction' });
-              else {
-                return res.send(post.value);
+            // increment both parties cancelled transactions
+            const userDetails =  {
+              _id: {
+                $in: [new ObjectID(transaction.sellerId), new ObjectID(transaction.buyerId)]
               }
+            };
+            const userUpdate = { $inc: { cancelledTransactions: 1 } };
+            Users.updateMany(userDetails, userUpdate, (err, users) => {
+            if(err) return res.send({ error: 'Could not find users' });
+
+              // then delete the transaction
+              Transactions.removeOne(transactionDetails, (err, response) => {
+                if(err) return res.send({ error: 'Could not delete transaction' });
+                else {
+                  return res.send(post.value);
+                }
+              });
             });
           }
         });

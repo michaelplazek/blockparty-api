@@ -25,15 +25,34 @@ module.exports = function(app, db) {
       completedTransactions: 0,
       cancelledTransactions: 0
     };
-    Users.insert(user, err => {
+
+    // find if username already exists
+    Users.findOne( { username: { $eq: req.body.username } } , (err, userCheck) => {
       if (err) throw err;
       else {
-        const token = generateToken(user);
-        res.json({
-          user: user,
-          token: token,
-          id: user._id.toString()
-        });
+
+        // username already exists
+        if (userCheck !== null) {
+          return res.status(404).json({
+            error: true,
+            message: "Username already exists"
+          });
+        }
+
+        // username does not exists
+        else {
+          Users.insertOne(user, err => {
+            if (err) throw err;
+            else {
+              const token = generateToken(user);
+              res.json({
+                user: user,
+                token: token,
+                id: user._id.toString()
+              });
+            }
+          });
+        }
       }
     });
   });
@@ -46,7 +65,7 @@ module.exports = function(app, db) {
         if (!user) {
           return res.status(404).json({
             error: true,
-            message: "Username or password is wrong."
+            message: "Incorrect username or password"
           });
         }
 
@@ -61,7 +80,7 @@ module.exports = function(app, db) {
         } else {
           return res.status(404).json({
             error: true,
-            message: "Username or password is wrong."
+            message: "Incorrect username or password"
           });
         }
       }

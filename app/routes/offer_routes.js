@@ -98,7 +98,7 @@ module.exports = function(app, db) {
 
     // get the ask or bid from the _id
     Bids.findOne(details, (err, post) => {
-      if (err) {
+      if (err || !post) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
@@ -144,7 +144,7 @@ module.exports = function(app, db) {
 
     // get the ask or bid from the _id
     Asks.findOne(details, (err, post) => {
-      if (err) {
+      if (err || !post) {
         res.send({error: "Post not found"});
       } else {
         const offer = {

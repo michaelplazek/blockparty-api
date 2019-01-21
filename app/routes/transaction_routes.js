@@ -80,7 +80,7 @@ module.exports = function(app, db) {
 
     // find the corresponding transaction
     Transactions.findOne(transactionDetails, (err, transaction) => {
-      if(err) return res.send({ error: "Could not find transaction" });
+      if(err || !transaction) return res.send({ error: "Could not find transaction" });
       else {
 
         // find out whether its the seller or buyer
@@ -174,7 +174,7 @@ module.exports = function(app, db) {
 
     // get transaction from id
     Transactions.findOne(transactionDetails, (err, transaction) => {
-      if (err) return res.send({error: "Could not find transaction"});
+      if (err || !transaction) return res.send({error: "Could not find transaction"});
       else {
         const { postId, bid } = transaction;
         const postDetails = { _id: new ObjectID(postId) };
@@ -235,7 +235,12 @@ module.exports = function(app, db) {
   app.get("/transaction/:id", (req, res) => {
     const details = { _id: new ObjectID(req.params.id) };
     Transactions.findOne(details, (err, transaction) => {
-      if (err) return res.send({ error: 'Could not find transaction' });
+      if (err || !transaction) {
+        return res.status(404).json({
+          error: true,
+          message: "Cannot find transaction"
+        });
+      }
       else {
         return res.send(transaction);
       }

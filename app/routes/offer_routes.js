@@ -11,8 +11,11 @@ module.exports = function(app, db) {
   app.get("/offer", (req, res) => {
     const details = {_id: new ObjectID(req.query.id)};
     Offers.findOne(details, (err, item) => {
-      if (err) {
-        res.send({error: "An error has occurred"});
+      if (err || !item) {
+        return res.status(404).json({
+          error: true,
+          message: "Cannot find offer"
+        });
       } else {
         res.send(item);
       }
@@ -95,7 +98,7 @@ module.exports = function(app, db) {
 
     // get the ask or bid from the _id
     Bids.findOne(details, (err, post) => {
-      if (err) {
+      if (err || !post) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
@@ -141,7 +144,7 @@ module.exports = function(app, db) {
 
     // get the ask or bid from the _id
     Asks.findOne(details, (err, post) => {
-      if (err) {
+      if (err || !post) {
         res.send({error: "Post not found"});
       } else {
         const offer = {
@@ -213,7 +216,7 @@ module.exports = function(app, db) {
       }, {});
     const update = {$set: updates};
     Offers.findOneAndUpdate(details, update, {returnOriginal: true}, (err, offer) => {
-      if(err) return res.send({ error: 'Could not update offer' });
+      if(err || !offer.value) return res.send({ error: 'Could not update offer' });
       else {
 
         // remove the offer from the post

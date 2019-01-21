@@ -22,8 +22,11 @@ module.exports = function(app, db) {
   app.get("/bid", (req, res) => {
     const details = { _id: new ObjectID(req.query.id) };
     db.collection("bids").findOne(details, (err, item) => {
-      if (err) {
-        res.send({ error: "An error has occurred" });
+      if (err || !item) {
+        return res.status(404).json({
+          error: true,
+          message: "Cannot find bid"
+        });
       } else {
         res.send(item);
       }

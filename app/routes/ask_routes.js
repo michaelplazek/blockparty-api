@@ -22,7 +22,7 @@ module.exports = function(app, db) {
   app.get("/ask", (req, res) => {
     const details = { _id: new ObjectID(req.query.id) };
     db.collection("asks").findOne(details, (err, item) => {
-      if (err) {
+      if (err || !item) {
         res.send({ error: "An error has occurred" });
       } else {
         res.send(item);

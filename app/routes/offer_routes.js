@@ -11,7 +11,7 @@ module.exports = function(app, db) {
   app.get("/offer", (req, res) => {
     const details = {_id: new ObjectID(req.query.id)};
     Offers.findOne(details, (err, item) => {
-      if (err) {
+      if (err || !item) {
         res.send({error: "An error has occurred"});
       } else {
         res.send(item);

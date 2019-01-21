@@ -235,7 +235,12 @@ module.exports = function(app, db) {
   app.get("/transaction/:id", (req, res) => {
     const details = { _id: new ObjectID(req.params.id) };
     Transactions.findOne(details, (err, transaction) => {
-      if (err || !transaction) return res.send({ error: 'Could not find transaction' });
+      if (err || !transaction) {
+        return res.status(404).json({
+          error: true,
+          message: "Cannot find transaction"
+        });
+      }
       else {
         return res.send(transaction);
       }

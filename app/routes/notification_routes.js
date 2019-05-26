@@ -3,6 +3,7 @@ const webpush = require('web-push');
 module.exports = function(app, db) {
 
   const Subscriptions = db.collection("subscriptions");
+  const Users = db.collection("users");
 
   app.post("/notifications/subscribe", (req, res) => {
     const { subscription, userId } = req.body;
@@ -28,13 +29,28 @@ module.exports = function(app, db) {
   });
 
   app.post("/notifications/notify", (req) => {
-    const { title, body, subscription } = req.body;
+    const { title, body, owner } = req.body;
     const message = {
       title,
       body,
     };
-    webpush.sendNotification(subscription, message)
-      .then(result => console.log(result))
-      .catch(e => console.log(e.stack))
+    const user = {
+      username: owner,
+    };
+    Users.findOne(user, (err, userInfo) => {
+      if (err) throw err;
+      else {
+        const userDetails = { userId: userInfo._id.toString() };
+        Subscriptions.findOne(userDetails, (err, result) => {
+          if (err) throw err;
+          else {
+            console.log(userDetails);
+            webpush.sendNotification(result.subscription,JSON.stringify(message))
+              .then(result => console.log(result))
+              .catch(e => console.log(e.stack))
+          }
+        });
+      }
+    });
   })
 };

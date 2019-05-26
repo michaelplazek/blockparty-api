@@ -10,7 +10,7 @@ module.exports = function(app, db) {
     Subscriptions.update({ userId }, {$set:{ subscription }}, { upsert: true}, err => {
       if (err) throw err;
       else {
-        res.send(subscription);
+        res.send({ 'success': true })
       }
     })
   });
@@ -23,12 +23,12 @@ module.exports = function(app, db) {
     Subscriptions.findOne(record, (err, subscription) => {
       if (err) throw err;
       else {
-        res.send(subscription);
+        res.send({ 'success': true })
       }
     })
   });
 
-  app.post("/notifications/notify", (req) => {
+  app.post("/notifications/notify", (req, res) => {
     const { title, body, owner } = req.body;
     const message = {
       title,
@@ -47,7 +47,9 @@ module.exports = function(app, db) {
             console.log(userDetails);
             webpush.sendNotification(result.subscription,JSON.stringify(message))
               .then(result => console.log(result))
-              .catch(e => console.log(e.stack))
+              .catch(e => console.log(e.stack));
+
+            res.send({ 'success': true })
           }
         });
       }

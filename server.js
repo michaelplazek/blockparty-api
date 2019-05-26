@@ -2,11 +2,15 @@ const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
+const webpush = require('web-push');
+
 const db = require("./config/db");
 
 const app = express();
 
 const port = process.env.PORT || 8000;
+
+webpush.setVapidDetails(process.env.WEB_PUSH_CONTACT, process.env.PUBLIC_PUSH_KEY, process.env.PRIVATE_PUSH_KEY);
 
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));

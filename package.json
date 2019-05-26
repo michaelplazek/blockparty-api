@@ -24,7 +24,8 @@
     "lodash": "^4.17.11",
     "md5": "^2.2.1",
     "mongodb": "2.2.16",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "web-push": "^3.3.5"
   },
   "devDependencies": {
     "nodemon": "^1.18.4"

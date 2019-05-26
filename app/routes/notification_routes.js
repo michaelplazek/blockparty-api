@@ -6,15 +6,35 @@ module.exports = function(app, db) {
 
   app.post("/notifications/subscribe", (req, res) => {
     const { subscription, userId } = req.body;
-    const record = {
-      subscription,
-      userId,
-    };
-    Subscriptions.insertOne(record, err => {
+    Subscriptions.update({ userId }, {$set:{ subscription }}, { upsert: true}, err => {
       if (err) throw err;
       else {
-        res.status(200).json({'success': true});
+        res.send(subscription);
       }
     })
+  });
+
+  app.post("/notifications/subscriptions", (req, res) => {
+    const { userId } = req.body;
+    const record = {
+      userId,
+    };
+    Subscriptions.findOne(record, (err, subscription) => {
+      if (err) throw err;
+      else {
+        res.send(subscription);
+      }
+    })
+  });
+
+  app.post("/notifications/notify", (req) => {
+    const { title, body, subscription } = req.body;
+    const message = {
+      title,
+      body,
+    };
+    webpush.sendNotification(subscription, message)
+      .then(result => console.log(result))
+      .catch(e => console.log(e.stack))
   })
 };

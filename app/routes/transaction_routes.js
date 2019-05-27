@@ -18,6 +18,9 @@ module.exports = function(app, db) {
       if (err) return res.send({ error: 'Offer not found' });
       else {
 
+        console.log(offer);
+        console.log(offerId);
+
         // get the associated ask or bid
         const Store = offer.bid ? Bids : Asks;
         const postDetails = {_id: new ObjectID(offer.postId)};
@@ -95,8 +98,6 @@ module.exports = function(app, db) {
             // see if both users have marked it as complete
             const complete = response.value.completedByBuyer && response.value.completedBySeller;
             if (complete) {
-
-              console.log(transaction);
 
               // increment both parties completed transactions
               const userDetails =  {

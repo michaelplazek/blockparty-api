@@ -14,6 +14,7 @@ webpush.setVapidDetails(process.env.WEB_PUSH_CONTACT, process.env.PUBLIC_PUSH_KE
 
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.enable('trust proxy');
 
 // authentication middleware to check JWT token
 app.use(function(req, res, next) {

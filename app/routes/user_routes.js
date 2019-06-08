@@ -215,4 +215,16 @@ module.exports = function(app, db) {
       }
     });
   });
+
+  // GET a user where query param id = _id
+  app.get("/user/:id", (req, res) => {
+    const details = { _id: new ObjectID(req.params.id) };
+    Users.findOne(details, (err, item) => {
+      if (err) {
+        res.send({ error: "An error has occurred" });
+      } else {
+        return res.send(item)
+      }
+    });
+  });
 };

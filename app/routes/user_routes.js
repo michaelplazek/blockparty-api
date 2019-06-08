@@ -223,7 +223,14 @@ module.exports = function(app, db) {
       if (err) {
         res.send({ error: "An error has occurred" });
       } else {
-        return res.send(item)
+        const userObj = {
+          username: item.username,
+          created: item.created,
+          bio: item.bio,
+          completedTransactions: item.completedTransactions,
+          cancelledTransactions: item.cancelledTransactions,
+        };
+        return res.send(userObj)
       }
     });
   });

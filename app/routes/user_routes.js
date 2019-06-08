@@ -229,6 +229,7 @@ module.exports = function(app, db) {
           bio: item.bio,
           completedTransactions: item.completedTransactions,
           cancelledTransactions: item.cancelledTransactions,
+          id: item._id
         };
         return res.send(userObj)
       }

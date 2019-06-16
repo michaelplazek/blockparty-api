@@ -43,13 +43,16 @@ module.exports = function(app, db) {
         const userDetails = { userId: userInfo._id.toString() };
         Subscriptions.findOne(userDetails, (err, result) => {
           if (err) throw err;
-          else {
+          else if (result) {
             console.log(userDetails);
             webpush.sendNotification(result.subscription,JSON.stringify(message))
               .then(result => console.log(result))
               .catch(e => console.log(e.stack));
 
             res.send({ 'success': true })
+          }
+          else {
+            res.send({ 'success': false })
           }
         });
       }

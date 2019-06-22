@@ -3,7 +3,7 @@ const MongoClient = require("mongodb").MongoClient;
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const webpush = require('web-push');
-const cors = require('cors');
+// const cors = require('cors');
 
 const db = require("./config/db");
 
@@ -17,18 +17,19 @@ app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.enable('trust proxy');
 
-const whitelist = ['http://localhost:3000', 'https://localhost:3000', 'https://blockparty.global'];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-};
-
-app.use(cors(corsOptions));
+// const whitelist = ['http://localhost:3000', 'https://localhost:3000', 'https://blockparty.global'];
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   },
+//   credentials: true,
+// };
+//
+// app.use(cors(corsOptions));
 
 // authentication middleware to check JWT token
 app.use(function(req, res, next) {
@@ -52,6 +53,7 @@ app.use(function(req, res, next) {
 
 // set headers for responses
 app.use(function(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"

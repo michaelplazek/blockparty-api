@@ -70,7 +70,7 @@ module.exports = function(app, db) {
             isAccepted: false,
             timestamp: new Date(),
             location: body.results[0].address_components,
-            reputation: (result.completedTransactions/(result.completedTransactions + result.cancelledTransactions)) * 5,
+            reputation: (result.completedTransactions + result.cancelledTransactions) !== 0 ? ((result.completedTransactions/(result.completedTransactions + result.cancelledTransactions)) * 5) : 0,
             offers: []
           };
           db.collection("asks").insert(post, (err, result) => {

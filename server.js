@@ -70,7 +70,7 @@ MongoClient.connect(
   (err, database) => {
     if (err) return console.log(err);
 
-    const db = database.db("cash-for-crypto-db");
+    const db = database.db("blockparty-prod");
     require("./app/routes")(app, db);
 
     app.listen(port, () => {

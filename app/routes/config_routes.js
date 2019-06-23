@@ -8,7 +8,6 @@ module.exports = function(app, db) {
     const details = { userId: req.body.userId };
     const updates = {$set: { dark: req.body.dark }};
     const options = { upsert: true, returnOriginal: false };
-    console.log(req.body);
     Configuration.findOneAndUpdate(details, updates, options, (err, item) => {
       if (err) {
         res.send({ error: "Error retrieving configuration" });
@@ -25,7 +24,6 @@ module.exports = function(app, db) {
     const details = { userId: req.body.userId };
     const updates = {$set: { visited: req.body.visited }};
     const options = { upsert: true, returnOriginal: false };
-    console.log(req.body);
     Configuration.findOneAndUpdate(details, updates, options, (err, item) => {
       if (err) {
         res.send({ error: "Error retrieving configuration" });

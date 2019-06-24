@@ -86,6 +86,7 @@ module.exports = function(app, db) {
 
   const Users = db.collection("users");
   const Remote = db.collection("remote");
+  const Configuration = db.collection("configuration");
 
   app.post("/users/login", (req, res) => {
     const { ip } = req;
@@ -150,10 +151,20 @@ module.exports = function(app, db) {
             if (err) throw err;
             else {
               const token = generateToken(user);
-              res.json({
-                user: user,
-                token: token,
-                id: user._id.toString()
+              const details = { userId: user._id.toString(), visited: false, dark: false };
+              Configuration.insertOne(details, (err, item) => {
+                if (err) {
+                  res.send({ error: "Error setting configuration" });
+                } else {
+                  if (item) {
+                    console.log('setting config', item);
+                    res.json({
+                      user: user,
+                      token: token,
+                      id: user._id.toString()
+                    });
+                  }
+                }
               });
             }
           });

@@ -157,7 +157,6 @@ module.exports = function(app, db) {
                   res.send({ error: "Error setting configuration" });
                 } else {
                   if (item) {
-                    console.log('setting config', item);
                     res.json({
                       user: user,
                       token: token,

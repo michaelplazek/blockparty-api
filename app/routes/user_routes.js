@@ -151,7 +151,7 @@ module.exports = function(app, db) {
             if (err) throw err;
             else {
               const token = generateToken(user);
-              const details = { userId: user._id.toString(), visited: false, dark: false };
+              const details = { userId: user._id.toString(), visited: false, dark: true };
               Configuration.insertOne(details, (err, item) => {
                 if (err) {
                   res.send({ error: "Error setting configuration" });

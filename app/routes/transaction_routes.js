@@ -7,6 +7,7 @@ module.exports = function(app, db) {
   const Asks = db.collection("asks");
   const Bids = db.collection("bids");
   const Transactions = db.collection("transactions");
+  const History = db.collection("history");
 
   // POST a new transaction based on an offer id
   app.post("/transaction", (req, res) => {
@@ -81,23 +82,35 @@ module.exports = function(app, db) {
     const { id, userId } = req.body;
     const transactionDetails = {_id: new ObjectID(id)};
 
+    console.log(`Setting transaction ${id} as complete by user ${userId}`);
+
     // find the corresponding transaction
     Transactions.findOne(transactionDetails, (err, transaction) => {
-      if(err || !transaction) return res.send({ error: "Could not find transaction" });
-      else {
+      if(err || !transaction) {
+        console.log(`Error: cannot find transaction`, err);
+        return res.send({ error: "Could not find transaction" });
+      } else {
+
+        console.log(`Transaction found.`);
 
         // find out whether its the seller or buyer
         const position = userId === transaction.sellerId ? "completedBySeller" : "completedByBuyer";
 
         // mark as completed
+        console.log(`Updating transaction`);
         const updates = {$set: { [position]: true }};
         Transactions.findOneAndUpdate(transactionDetails, updates, {returnOriginal: false}, (err, response) => {
-          if(err) return res.send({ error: 'Could not update transaction' });
+          if(err) {
+            console.log(`Error: cannot update transaction`, err);
+            return res.send({ error: 'Could not update transaction' });
+          }
           else {
 
             // see if both users have marked it as complete
             const complete = response.value.completedByBuyer && response.value.completedBySeller;
             if (complete) {
+
+              console.log(`Both users have marked the transaction as complete`);
 
               // increment both parties completed transactions
               const userDetails =  {
@@ -105,19 +118,31 @@ module.exports = function(app, db) {
                   $in: [new ObjectID(transaction.sellerId), new ObjectID(transaction.buyerId)]
                 }
               };
+
+              console.log(`Updating completed transactions for the users`);
               const userUpdate = { $inc: { completedTransactions: 1 } };
               Users.updateMany(userDetails, userUpdate, (err, users) => {
 
-                if(err) return res.send({ error: "Could not update users" });
+                if(err) {
+                  console.log(`Error: could not update users`, err);
+                  return res.send({ error: "Could not update users" });
+                }
                 else {
+
+                  console.log(`Updating post`);
 
                   // get the original post and set isAccepted to false
                   const Store = response.value.bid ? Bids : Asks;
                   const postDetails = { _id: new ObjectID(response.value.postId) };
                   const updates = {$set: {isAccepted: false, offers: []}};
                   Store.findOneAndUpdate(postDetails, updates, {returnOriginal: true}, (err, post) => {
-                    if(err) return res.send({ error: 'Could not find post' });
+                    if(err) {
+                      console.log(`Error: could not find user`, err);
+                      return res.send({ error: 'Could not find post' });
+                    }
                     else {
+
+                      console.log(`Found post`);
 
                       // see if the offer volume was less than the total volume
                       const offerVolume = transaction.volume;
@@ -127,29 +152,64 @@ module.exports = function(app, db) {
 
                       // we can just subtract the value from the post
                       if(lessThan){
+                        console.log(`Offer is less than total of the post; updating post...`);
                         const updates = {$set: {volume: difference}};
                         Store.updateOne(postDetails, updates, (err, response) => {
-                          if(err) return res.send({ error: 'Could not find post' });
+                          if(err) {
+                            console.log(`Error: cannot find post`, err);
+                            return res.send({ error: 'Could not find post' });
+                          } else {
+                            console.log(`Transaction updated`);
+                          }
                         });
                       } else { // otherwise, we can just delete the post
+                        console.log(`Offer is for entire post; deleting post...`);
                         Store.deleteOne(postDetails, (err, response) => {
-                          if(err) return res.send({ error: 'Could not find post' });
+                          if(err) {
+                            console.log(`Error: could not find post`, err);
+                            return res.send({ error: 'Could not find post' });
+                          }
+                          else {
+                            console.log(`Posts deleted`);
+                          }
                         });
                       }
 
                       // now we need to delete remaining offers
+                      console.log(`Deleting remaining offers for post`);
                       const offers = post.value.offers.map(item => new ObjectID(item));
                       Offers.removeMany({'_id':{'$in': offers}}, (err, response) => {
-                        if(err) return res.send({ error: "Could not delete offers" });
+                        if(err) {
+                          console.log(`Error: could not delete offers`, err);
+                          return res.send({ error: "Could not delete offers" });
+                        }
                         else {
+
+                          console.log(`Deleting transaction`);
 
                           // now delete the transaction
                           Transactions.removeOne(transactionDetails, (err, response) => {
-                            if(err) return res.send({ error: "Could not delete the transaction" });
+                            if(err) {
+                              console.log(`Error: could not delete transaction`, err);
+                              return res.send({ error: "Could not delete the transaction" });
+                            }
                             else {
-
-                              // return the result if both parties marked as completed
-                              return res.send(response);
+                              const history = {
+                                ...transaction,
+                                completed: true,
+                              };
+                              console.log(`Adding history for transaction ${transaction._id.toString()}`);
+                              History.insertOne(history, (err, response) => {
+                                if(err) {
+                                  console.log(`Error: could not add transaction to history`, err);
+                                  return res.send({ error: 'Error adding transaction to history' });
+                                }
+                                else {
+                                  console.log(`Transaction successful`);
+                                  // return the result if both parties marked as completed
+                                  return res.send(response);
+                                }
+                              });
                             }
                           });
                         }
@@ -161,6 +221,7 @@ module.exports = function(app, db) {
             } else {
 
               // return the result if only one has marked as completed
+              console.log(`Successfully marked as complete`);
               return res.send(response.value);
             }
           }
@@ -173,18 +234,29 @@ module.exports = function(app, db) {
     const { id } = req.body;
     const transactionDetails = {_id: new ObjectID(id)};
 
+    console.log(`Cancelling transaction`);
+
     // get transaction from id
     Transactions.findOne(transactionDetails, (err, transaction) => {
-      if (err || !transaction) return res.send({error: "Could not find transaction"});
+      if (err || !transaction) {
+        console.log(`Error: could not find transaction`, err);
+        return res.send({error: "Could not find transaction"});
+      }
       else {
+        console.log(`Transaction found`);
         const { postId, bid } = transaction;
         const postDetails = { _id: new ObjectID(postId) };
         const updates = {$set: {isAccepted: false}};
         const Store = bid ? Bids : Asks;
+        console.log(`Reinstating post`);
         Store.findOneAndUpdate(postDetails, updates, (err, post) => {
-          if(err) return res.send({ error: 'Could not find post' });
+          if(err) {
+            console.log(`Error: could not find post`, err);
+            return res.send({ error: 'Could not find post' });
+          }
           else {
 
+            console.log(`Post found`);
             // increment both parties cancelled transactions
             const userDetails =  {
               _id: {
@@ -192,14 +264,37 @@ module.exports = function(app, db) {
               }
             };
             const userUpdate = { $inc: { cancelledTransactions: 1 } };
+            console.log(`Updating users`);
             Users.updateMany(userDetails, userUpdate, (err, users) => {
-            if(err) return res.send({ error: 'Could not find users' });
+            if(err) {
+              console.log(`Error: could not find users`, err);
+              return res.send({ error: 'Could not find users' });
+            }
 
+              console.log(`Deleting transaction`);
               // then delete the transaction
               Transactions.removeOne(transactionDetails, (err, response) => {
-                if(err) return res.send({ error: 'Could not delete transaction' });
+                if(err) {
+                  console.log(`Error: could not delete transaction`, err);
+                  return res.send({ error: 'Could not delete transaction' });
+                }
                 else {
-                  return res.send(post.value);
+                  const history = {
+                    ...transaction,
+                    completed: false,
+                  };
+                  console.log(`Adding history`);
+                  History.insertOne(history, (err, response) => {
+                    if(err) {
+                      console.log(`Error: could not add transaction to history`);
+                      return res.send({ error: 'Error adding transaction to history' });
+                    }
+                    else {
+                      console.log(`Transaction successfully cancelled`);
+                      // return the result if both parties marked as completed
+                      return res.send(post.value);
+                    }
+                  });
                 }
               });
             });

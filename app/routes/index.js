@@ -5,6 +5,7 @@ const offerRoutes = require("./offer_routes");
 const transactionRoutes = require("./transaction_routes");
 const notificationRoutes = require("./notification_routes");
 const configRoutes = require("./config_routes");
+const historyRoutes = require("./history_routes");
 
 module.exports = function(app, db) {
   askRoutes(app, db);
@@ -14,4 +15,5 @@ module.exports = function(app, db) {
   transactionRoutes(app, db);
   notificationRoutes(app, db);
   configRoutes(app, db);
+  historyRoutes(app, db);
 };

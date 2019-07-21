@@ -197,6 +197,7 @@ module.exports = function(app, db) {
                               const history = {
                                 ...transaction,
                                 completed: true,
+                                timestamp: new Date(),
                               };
                               console.log(`Adding history for transaction ${transaction._id.toString()}`);
                               History.insertOne(history, (err, response) => {
@@ -282,6 +283,7 @@ module.exports = function(app, db) {
                   const history = {
                     ...transaction,
                     completed: false,
+                    timestamp: new Date(),
                   };
                   console.log(`Adding history`);
                   History.insertOne(history, (err, response) => {
